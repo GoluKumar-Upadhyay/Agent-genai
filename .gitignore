@@ -1,0 +1,6 @@
+/venv
+/.env
+/keys
+\venv
+\.env
+\keys
