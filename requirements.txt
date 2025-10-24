@@ -17,15 +17,9 @@ docx2txt>=0.8
 pdf2image>=1.16.3
 pillow>=10.1.0
 
-# NER / Transformers
-transformers>=4.42.0
-torch>=2.1.0
-sentencepiece>=0.1.99
-indic-nlp-library>=0.81.6
 
-# Visualization & Graphs
-networkx>=3.1
-matplotlib>=3.8.0
+
+
 
 # HTTP requests
 requests>=2.31.0
