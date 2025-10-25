@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Validation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        textarea { width: 100%; height: 300px; }
+        .result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; }
+        .error { color: red; }
+        button { padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Upload Legal Document</h2>
+    <form id="docForm" enctype="multipart/form-data">
+        <label>Select Category:</label>
+        <select name="category" id="category">
+            <option value="citizen">Citizen</option>
+            <option value="business">Business</option>
+            <option value="student">Student</option>
+        </select><br><br>
+        <input type="file" name="document" id="document" required><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="resultContainer"></div>
+
+    <script>
+        const form = document.getElementById("docForm");
+        const resultContainer = document.getElementById("resultContainer");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault(); // prevent page reload
+            resultContainer.innerHTML = "Processing...";
+
+            const formData = new FormData();
+            formData.append("document", document.getElementById("document").files[0]);
+            formData.append("category", document.getElementById("category").value);
+
+            try {
+                const response = await fetch("/validate", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server Error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                resultContainer.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        });
+
+        function displayResult(result) {
+            if (result.error) {
+                resultContainer.innerHTML = `<p class="error">${result.error}</p>`;
+                return;
+            }
+
+            let html = `
+                <div class="result">
+                    <h3>Predicted Category: ${result.predicted_category}</h3>
+                    <p><strong>Confidence:</strong> ${result.confidence}</p>
+                    <p><strong>Reason:</strong> ${result.reason}</p>
+                    <p><strong>Suggested Action:</strong> ${result.suggested_action}</p>
+            `;
+
+            if (result.extracted_text) {
+                html += `
+                    <h4>Extracted Text:</h4>
+                    <textarea readonly>${result.extracted_text}</textarea>
+                `;
+            }
+
+            html += "</div>";
+            resultContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
